@@ -30,4 +30,41 @@
 
 -------
 
-重构心得
+#### 重构心得(2018.07.16)
+
+第一版（reconstruction/board-old.js）着急上线写的比较乱，耦合度非常的高，代码阅读起来比较费劲，虽然功能啥的都实现了，但是后期不好维护。
+后来决定重构代码，重构的第一版（index.js），代码结构比之前的清晰很多，但耦合度还是比较高，不方便拓展和复用，方法处理干净。所以后期抽空我还会继续重构，直到耦合度非常低，可以拓展复用为止。
+
+**遇到的问题**
+
+拖动的时候，鼠标快速闪开，然后再触碰tag，tag会吸附到鼠标上。
+
+*解决办法*
+
+拖动的mouseup一开始是绑定在tag的class上面的
+
+```js
+$(document).on('mousemove', '.js-checked-tag', function(ev) {
+  ...
+});
+
+$('.js-checked-tag').mouseup(function(ev) {
+  $(document).unbind('mousemove');
+  ...
+})
+```
+所以当鼠标快速闪过的时候，就已经脱离了tag这个元素，这个时候哪怕触发了mouseup也无法停止它的move事件。
+于是我把mouseup事件绑定在了document上面。
+
+```js
+document.onmouseup = function() {
+  if (Elstatus == 'draging') {
+    $(document).unbind('mousemove');
+  }
+};
+
+```
+
+这样就可以完美的解决这个问题啦，当然换成document之后，绑定数据的this也变了，所以mouseup这里的this要重新绑定一下，不然数据会有问题。
+
+

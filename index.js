@@ -6,10 +6,9 @@ define(function(require, exports, module) {
     var editor = CKEDITOR.replace('certificateeditor', {
       toolbar: [
         { items: [ 'FontSize', 'Font','JustifyLeft', 'JustifyCenter', 'JustifyRight', 'TextColor', '-'] },
-        // { items: [ 'Font', 'Bold', 'Italic', 'Underline', 'TextColor', '-'] }
       ],
       allowedContent: true,
-      height: 150,
+      height: 120,
       font_names: '宋体;黑体;楷体;Times New Roman;'
     });
     var styleArr = [];
@@ -164,20 +163,6 @@ define(function(require, exports, module) {
       }
     }
 
-    a();
-    b();
-    var status = c(el, keys=['width', 'x']);
-    d(status)
-
-    addTag ({tagDetils, container, defaultStatus})
-        setDefaultStatus();
-        createTag();
-        setTagDeatils();
-        appendTag(container);
-
-
-
-
     function deleteTag(obj) {
       var $disabledTag = $('[data-id = ' + $('.js-checked-tag').attr('data-id') + ']');
       $('.js-checked-tag').remove();
@@ -217,15 +202,6 @@ define(function(require, exports, module) {
       }
     });
 
-    var moveHandle = {
-      drag: () => {
-        dragHandle();
-      },
-      scale: () => {
-        scaleHandle();
-      },
-    }
-
     // 拖动
     function dragAction(ev) {
       $('.js-checked-tag').mousedown(function(ev) {
@@ -234,8 +210,7 @@ define(function(require, exports, module) {
         var scaleEl = $('.coor')[0];
         var currentEl = $(this)[0];
         var Elstatus = currentEl.currentData.status;
-        Elstatus = 'drag';
-        Elstatus = 'scale';
+        Elstatus = 'willdrag';
         var originalW = $(this).width(); // 获取拖拽前div的宽
         var originalH = $(this).height(); // 获取拖拽前div的高
 
@@ -244,13 +219,7 @@ define(function(require, exports, module) {
           var originalY = ev.clientY - this.offsetTop;
         }
 
-        $('.js-checked-tag').mousemove(function(ev) {
-          const currantHandle = moveHandle[Elstatus] || () => {
-            console.error('move handle is unavaliable', Elstatus);
-          };
-          currantHandle();
-
-
+        $(document).on('mousemove', '.js-checked-tag', function(ev) {
           var ev = ev || window.event;
           var self = this;
           if (Elstatus == 'draged') {
@@ -268,11 +237,11 @@ define(function(require, exports, module) {
           Elstatus = 'draging';
         });
 
-        $(document).on('mouseup', '.js-checked-tag', function() {
+        document.onmouseup = function() {
           if (Elstatus == 'draging') {
             Elstatus = 'draged';
-            var self = $(this)[0];
-            $('.js-checked-tag').unbind('mousemove');
+            var self = $('.js-checked-tag')[0];
+            $(document).unbind('mousemove');
             var result = {
               x: window.self.moveXInterval - originalW / 2,
               y: window.self.moveYInterval - originalH / 2,
@@ -282,7 +251,7 @@ define(function(require, exports, module) {
               self.currentData[i] = result[i];
             }
           }
-        });
+        };
       });
     }
 
